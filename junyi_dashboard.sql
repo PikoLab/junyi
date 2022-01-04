@@ -87,7 +87,7 @@ SELECT * FROM log_videoplay;
 
 
 -- Question1: 找出當週不重複訪客(Weekly Active User)
--- 可設計圖表(bar chart/ line chart)：week時間為X軸，當週不重複訪客數量為Y軸。
+-- 可設計圖表(bar chart/ line chart)：week時間為X軸; 當週不重複訪客數量為Y軸。
 
 SELECT YEARWEEk(date) AS week , COUNT(DISTINCT(user_primary_key)) AS weekly_active_user
 FROM log_videoproblem
@@ -96,7 +96,7 @@ ORDER BY 1 ASC;
 
 
 -- Question2: 當週不重複訪客中來自各縣市的成員(Weekly Active User by City)
--- 可設計圖表（stack bar chart),當週不重複訪客中來自各縣市的成員
+-- 可設計圖表（stack bar chart)：week時間為X軸; 當週不重複訪客數量為Y軸，並依據各縣市數量堆疊訪客數量。
 -- 需要填補「Info_UserData」table中的user_city缺失值
 
 WITH user_school_city AS (
@@ -119,11 +119,15 @@ ORDER BY 1 ASC, 3 DESC;
 
 -- Question3: 
 -- 從圖表中可以看到均一持續累積的社會影響力，包含註冊人數，每週活躍人數，使用時間等等。
--- 另外我會思考一個問題，這份報表想提供給哪些人看，在上次談話中有提到，均一平台的主要服務對象有ToC, ToB, ToG，目前的趨勢數據我認為比較適合給ToG/ToB，讓他們可以了解到均一學習平台的影響力
--- 針對ToC，我想到一個命題「提供產品發展與優化」的思考方向，來設計圖表呈現。均一目前服務的學生很廣，從國小, 國中, 高中都有，科目包含全科我會想要思考目前均一的使用者當中，在籍的學生其年級分佈，並且在每一年級當中主要觀看的科目有哪一些？透過此一分析抓到均一核心的產品強項，考慮加強發展
+-- 另外我會思考一個問題，這份報表想提供給哪些人看，在上次談話中有提到，均一平台的主要服務對象有ToC, ToB, ToG，
+-- 目前的趨勢數據我認為比較適合給ToG/ToB，讓他們可以了解到均一學習平台的影響力
+
+-- 針對ToC，可以「提供產品發展與優化」為思考方向，設計圖表呈現。例如均一目前服務的學生很廣，從國小, 國中, 高中都有，
+-- 科目包含全科，可從中進行資料探勘，了解目前均一的使用者當中，在籍的學生其年級分佈，並且在每一年級當中主要觀看的科目有哪一些？
+-- 透過此一分析抓到均一核心的產品強項，考慮加強發展
 
 
--- 另外建議可針對user role查看當週內容使用人次(stack bar chart)，使用時長（stack bar chart）查看student和teacher的使用情形變化
+-- 另外建議可針對user role查看當週內容使用人次(stack bar chart)與使用時長（stack bar chart）查看student和teacher的使用情形變化
 -- 下表為使用人次 
 SELECT YEARWEEK(t1.date) AS week,
 		SUM(CASE WHEN t2.user_role = 'Teacher' and t1.content_kind='Video' THEN 1 ELSE 0 END) AS teacher_video,
@@ -137,7 +141,8 @@ ORDER BY 1;
 
 
 -- 下表為使用時長
--- 使用時長估算說明：依據log_videoplay表單中的欄位video_is_session_end進行推估，使用時長＝(0的個數加總)*30+(1的個數加總）* 估計學習時間15分鐘
+-- 使用時長估算說明：依據log_videoplay表單中的欄位is_session_end進行推估
+-- 使用時長＝(0的個數加總)*30+(1的個數加總）* 估計學習時間15分鐘
 -- 未滿30分鐘的學習階段，以眾數15分鐘計算（參考網站https://www.junyiacademy.org/statistics，各時段平均使用時間圖表）
 
 WITH session_check AS (
