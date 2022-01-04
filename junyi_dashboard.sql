@@ -159,14 +159,3 @@ SELECT YEARWEEK(date) AS week,
                  WHEN user_role = 'Student' and is_session_end=1 THEN 15 ELSE 0 END) AS student
 FROM session_check
 GROUP BY 1;
-
-
-
-
-
-
-
-
-
-
-    
