@@ -142,16 +142,16 @@ ORDER BY 1;
 -- 未滿30分鐘的學習階段，以眾數15分鐘計算（參考網站https://www.junyiacademy.org/statistics，各時段平均使用時間圖表）
 
 WITH session_check AS (
-	  SELECT t1.date as date, t2.user_role as user_role, t1.is_session_end as is_session_end 
+    SELECT t1.date as date, t2.user_role as user_role, t1.is_session_end as is_session_end 
     FROM log_videoplay t1
     JOIN info_userdata t2 ON t1.user_primary_key=t2.user_primary_key
     WHERE t2.user_role='Teacher' or t2.user_role='Student' 
 )
 
 SELECT YEARWEEK(date) AS week, 
-		SUM(CASE WHEN user_role = 'Teacher' and is_session_end=0 THEN 30 
-				WHEN user_role = 'Teacher' and is_session_end=1  THEN 15 ELSE 0 END) AS teacher,
+		SUM(CASE WHEN user_role = 'Teacher' and is_session_end=0 THEN 30
+      WHEN user_role = 'Teacher' and is_session_end=1  THEN 15 ELSE 0 END) AS teacher,
 		SUM(CASE WHEN user_role = 'Student' and is_session_end=0 THEN 30 
-        WHEN user_role = 'Student' and is_session_end=1 THEN 15 ELSE 0 END) AS student
+      WHEN user_role = 'Student' and is_session_end=1 THEN 15 ELSE 0 END) AS student
 FROM session_check
 GROUP BY 1;
