@@ -80,23 +80,17 @@ VALUES('x0001', 'cid_3001', '2021-12-03 08:18:41','2021-12-03', 1, 0, 0, 0, 0, 1
 ('x0012', 'cid_9627', '2019-11-20 08:18:41','2019-11-20', 0, 0, 1, 0, 82, 85, 126, 0, 6 );
 
 
-SELECT * FROM info_ip_cityschool;
-SELECT * FROM info_userdata;
-SELECT * FROM log_videoproblem;
-SELECT * FROM log_videoplay;
-
-
 -- Question1: 找出當週不重複訪客(Weekly Active User)
 -- 可設計圖表(bar chart/ line chart)：week時間為X軸; 當週不重複訪客數量為Y軸。
 
-SELECT YEARWEEk(date) AS week , COUNT(DISTINCT(user_primary_key)) AS weekly_active_user
+SELECT YEARWEEK(date) AS week , COUNT(DISTINCT(user_primary_key)) AS weekly_active_user
 FROM log_videoproblem
 GROUP BY 1
 ORDER BY 1 ASC;
 
 
 -- Question2: 當週不重複訪客中來自各縣市的成員(Weekly Active User by City)
--- 可設計圖表（stack bar chart)：week時間為X軸; 當週不重複訪客數量為Y軸，並依據各縣市數量堆疊訪客數量。
+-- 可設計圖表（stack bar chart)：week時間為X軸; 當週不重複訪客數量為Y軸，並依據各縣市訪客數量進行堆疊。
 -- 需要填補「Info_UserData」table中的user_city缺失值
 
 WITH user_school_city AS (
@@ -125,9 +119,9 @@ ORDER BY 1 ASC, 3 DESC;
 -- 科目包含全科，可從中進行資料探勘，了解目前均一的使用者當中，「在籍的學生其年級分佈」，「在每一年級當中主要觀看的科目有哪一些」
 -- 透過此一分析抓到均一核心的產品強項，作為吸引C端族群的使用動機
 
--- 另外建議可針對user role查看當週內容使用人次(stack bar chart)與使用時長（stack bar chart）查看student和teacher的使用情形變化
+-- 另外建議可針對user role查看當週內容使用人次(stack bar chart)與使用時長（stack bar chart）
 -- 由此可瞭解平台的主要使用者student和teacher他們的實際投入情況(engagement)，以作為成果回饋。
--- 下表為使用人次 
+-- 下表為每週使用人次 
 
 SELECT YEARWEEK(t1.date) AS week,
 		SUM(CASE WHEN t2.user_role = 'Teacher' and t1.content_kind='Video' THEN 1 ELSE 0 END) AS teacher_video,
@@ -140,13 +134,15 @@ GROUP BY 1
 ORDER BY 1;
 
 
--- 下表為使用時長
+-- 下表為每週使用時長
 -- 使用時長估算說明：依據log_videoplay表單中的欄位is_session_end進行推估
 -- 使用時長＝(0的個數加總)*30+(1的個數加總）* 估計學習時間15分鐘
+-- is_session_end＝0(False）學習階段已經經過30分鐘，但是學習仍然延續，尚未結束
+-- is_session_end＝1(True)，學習階段已經結束，學習時長未超過30分鐘）
 -- 未滿30分鐘的學習階段，以眾數15分鐘計算（參考網站https://www.junyiacademy.org/statistics，各時段平均使用時間圖表）
 
 WITH session_check AS (
-	SELECT t1.date as date, t2.user_role as user_role, t1.is_session_end as is_session_end 
+	  SELECT t1.date as date, t2.user_role as user_role, t1.is_session_end as is_session_end 
     FROM log_videoplay t1
     JOIN info_userdata t2 ON t1.user_primary_key=t2.user_primary_key
     WHERE t2.user_role='Teacher' or t2.user_role='Student' 
@@ -154,8 +150,8 @@ WITH session_check AS (
 
 SELECT YEARWEEK(date) AS week, 
 		SUM(CASE WHEN user_role = 'Teacher' and is_session_end=0 THEN 30 
-				 WHEN user_role = 'Teacher' and is_session_end=1  THEN 15 ELSE 0 END) AS teacher,
+				WHEN user_role = 'Teacher' and is_session_end=1  THEN 15 ELSE 0 END) AS teacher,
 		SUM(CASE WHEN user_role = 'Student' and is_session_end=0 THEN 30 
-                 WHEN user_role = 'Student' and is_session_end=1 THEN 15 ELSE 0 END) AS student
+        WHEN user_role = 'Student' and is_session_end=1 THEN 15 ELSE 0 END) AS student
 FROM session_check
 GROUP BY 1;
