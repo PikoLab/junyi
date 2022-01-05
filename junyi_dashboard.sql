@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS junyi DEFAULT CHARSET = utf8mb4 DEFAULT COLLATE = utf8mb4_unicode_ci;
 use junyi;
 
+
 CREATE TABLE IF NOT EXISTS info_userdata (
   `user_primary_key` varchar(50) NOT NULL,
   `user_nickname` varchar(50) NOT NULL,
@@ -29,7 +30,6 @@ CREATE TABLE IF NOT EXISTS log_videoproblem (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
-
 CREATE TABLE IF NOT EXISTS log_videoplay (
   `user_primary_key` varchar(50) NOT NULL,
   `content_id` varchar(20) NOT NULL,
@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS log_videoplay (
   `is_session_end` int NOT NULL,
   `play_times` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 
 
 -- Create Mock Data
@@ -79,6 +78,7 @@ VALUES('x0001', 'cid_3001', '2021-12-03 08:18:41','2021-12-03', 1, 0, 0, 0, 0, 1
 ('x0009', 'cid_9627', '2019-11-20 08:18:41','2019-11-20', 0, 0, 1, 0, 82, 85, 126, 0, 6 ),
 ('x0011', 'cid_9627', '2019-11-20 08:18:41','2019-11-20', 0, 0, 1, 0, 82, 85, 126, 0, 6 ),
 ('x0012', 'cid_9627', '2019-11-20 08:18:41','2019-11-20', 0, 0, 1, 0, 82, 85, 126, 0, 6 );
+
 
 SELECT * FROM info_ip_cityschool;
 SELECT * FROM info_userdata;
@@ -116,19 +116,19 @@ GROUP BY 1,2
 ORDER BY 1 ASC, 3 DESC;
 
 
-
 -- Question3: 
 -- 從圖表中可以看到均一持續累積的社會影響力，包含註冊人數，每週活躍人數，使用時間等等。
 -- 另外我會思考一個問題，這份報表想提供給哪些人看，在上次談話中有提到，均一平台的主要服務對象有ToC, ToB, ToG，
 -- 目前的趨勢數據我認為比較適合給ToG/ToB，讓他們可以了解到均一學習平台的影響力
 
--- 針對ToC，可以「提供產品發展與優化」為思考方向，設計圖表呈現。例如均一目前服務的學生很廣，從國小, 國中, 高中都有，
--- 科目包含全科，可從中進行資料探勘，了解目前均一的使用者當中，在籍的學生其年級分佈，並且在每一年級當中主要觀看的科目有哪一些？
--- 透過此一分析抓到均一核心的產品強項，考慮加強發展
-
+-- 針對ToC，可以「user使用產品的engagement」為思考方向，設計圖表呈現。例如均一目前服務的學生很廣，從國小, 國中, 高中都有，
+-- 科目包含全科，可從中進行資料探勘，了解目前均一的使用者當中，「在籍的學生其年級分佈」，「在每一年級當中主要觀看的科目有哪一些」
+-- 透過此一分析抓到均一核心的產品強項，作為吸引C端族群的使用動機
 
 -- 另外建議可針對user role查看當週內容使用人次(stack bar chart)與使用時長（stack bar chart）查看student和teacher的使用情形變化
+-- 由此可瞭解平台的主要使用者student和teacher他們的實際投入情況(engagement)，以作為成果回饋。
 -- 下表為使用人次 
+
 SELECT YEARWEEK(t1.date) AS week,
 		SUM(CASE WHEN t2.user_role = 'Teacher' and t1.content_kind='Video' THEN 1 ELSE 0 END) AS teacher_video,
 		SUM(CASE WHEN t2.user_role = 'Teacher' and t1.content_kind='Exercise' THEN 1 ELSE 0 END) AS teacher_exercise,
