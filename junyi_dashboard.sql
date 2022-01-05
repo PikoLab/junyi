@@ -138,7 +138,7 @@ ORDER BY 1;
 -- 使用時長估算說明：依據log_videoplay表單中的欄位is_session_end進行推估
 -- 使用時長＝(0的個數加總)*30+(1的個數加總）* 估計學習時間15分鐘
 -- is_session_end＝0(False）學習階段已經經過30分鐘，但是學習仍然延續，尚未結束
--- is_session_end＝1(True)，學習階段已經結束，學習時長未超過30分鐘）
+-- is_session_end＝1(True)，學習階段已經結束，學習時長未超過30分鐘
 -- 未滿30分鐘的學習階段，以眾數15分鐘計算（參考網站https://www.junyiacademy.org/statistics，各時段平均使用時間圖表）
 
 WITH session_check AS (
